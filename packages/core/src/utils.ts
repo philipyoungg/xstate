@@ -29,7 +29,6 @@ import {
 } from './constants';
 import { IS_PRODUCTION } from './environment';
 import { StateNode } from './StateNode';
-import { State } from '.';
 import { Actor } from './Actor';
 
 export function keys<T extends object>(value: T): Array<keyof T & string> {
@@ -511,6 +510,19 @@ export function toGuard<TContext, TEvent extends EventObject>(
   }
 
   return condition;
+}
+
+export function toGuards<TContext, TEvent extends EventObject>(
+  condition?: SingleOrArray<Condition<TContext, TEvent>> | undefined,
+  guardMap?: Record<string, ConditionPredicate<TContext, TEvent>>
+): Array<Guard<TContext, TEvent>> {
+  if (!condition) {
+    return [];
+  }
+
+  const conditions = isArray(condition) ? condition : [condition];
+
+  return conditions.map(condition => toGuard(condition, guardMap));
 }
 
 export function isObservable<T>(
